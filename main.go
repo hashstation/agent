@@ -48,4 +48,5 @@ func main() {
     for k, v := range tlvFileReader.Map {
         fmt.Printf("%s: %v\n", k, v)
     }
+
 }
