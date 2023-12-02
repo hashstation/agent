@@ -3,50 +3,67 @@
 package main
 
 import (
-    "fmt"
-    "os"
-    "path/filepath"
-    "strings"
-    "github.com/hashstation/agent/utils"
+	"fmt"
+	"github.com/hashstation/agent/utils"
+	"os"
+	"path/filepath"
+	"runtime"
 )
 
 func main() {
-	hashcatFilesFound := false
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
 
-    err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-        if err != nil {
-            return err
-        }
+	files, err := filepath.Glob(filepath.Join(cwd, "hashcat_files*.zip"))
+	if err != nil {
+		panic(err)
+	}
 
-        if strings.HasPrefix(info.Name(), "hashcat_files") && strings.HasSuffix(info.Name(), ".zip") {
-			hashcatFilesFound = true
-            //zipFile := utils.ZipFile{Path: path}
-            //return zipFile.UnpackTo("test")
-        }
+	if len(files) == 0 {
+		fmt.Fprintln(os.Stderr, "No hashcat files found.")
+		os.Exit(1)
+	}
 
-        return nil
-    })
+	// zipFile := utils.ZipFile{Path: files[0]}
+	// zipFile.UnpackTo("test") // cwd
 
-    if err != nil || !hashcatFilesFound {
-        fmt.Fprintln(os.Stderr, "No hashcat files found.")
-        os.Exit(1)
-    }
+	var hashcatPattern string
+	if runtime.GOOS == "windows" {
+		hashcatPattern = "hashcat*.exe"
+	} else if runtime.GOOS == "linux" {
+		hashcatPattern = "hashcat*.bin"
+	} else if runtime.GOOS == "darwin" {
+		hashcatPattern = "hashcat*.app"
+	}
 
-    configFile := "config"
+	files, err = filepath.Glob(filepath.Join(cwd, hashcatPattern))
+	if err != nil {
+		panic(err)
+	}
 
-    if len(os.Args) > 1 {
-        configFile = os.Args[1]
-    }
+	if len(files) == 0 {
+		fmt.Fprintln(os.Stderr, "No hashcat binary found.")
+		os.Exit(1)
+	}
+
+	hashcatBinary := files[0]
+	fmt.Println(hashcatBinary)
+
+	configFile := "config"
+	if len(os.Args) > 1 {
+		configFile = os.Args[1]
+	}
 
 	tlvFileReader := utils.CreateTLVFileReader(configFile)
-    err = tlvFileReader.Parse()
-    if err != nil {
-        fmt.Fprintln(os.Stderr, "Error parsing file:", err)
-        return
-    }
+	err = tlvFileReader.Parse()
+	if err != nil {
+		panic(err)
+	}
 
-    for k, v := range tlvFileReader.Map {
-        fmt.Printf("%s: %v\n", k, v)
-    }
+	for k, v := range tlvFileReader.Map {
+		fmt.Printf("%s: %v\n", k, v)
+	}
 
 }
