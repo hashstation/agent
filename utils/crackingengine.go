@@ -5,21 +5,21 @@ import (
    "strings"
 )
 
-type Hashcat struct {
+type CrackingEngine struct {
 	Executable string
     Args []string
 }
 
-func (h *Hashcat) AddArg(Arg string) {
-    h.Args = append(h.Args, Arg)
+func (e *CrackingEngine) AddArg(Arg string) {
+    e.Args = append(e.Args, Arg)
 }
 
-func (h *Hashcat) AsCmd(Arg string) string {
-    for i, arg := range h.Args {
+func (e *CrackingEngine) AsCmd(Arg string) string {
+    for i, arg := range e.Args {
         if strings.ContainsAny(arg, " ?") {
-			h.Args[i] = `"` + arg + `"`
+			e.Args[i] = `"` + arg + `"`
 		}
     }
-    return h.Executable + " " + strings.Join(h.Args, " ")
+    return e.Executable + " " + strings.Join(e.Args, " ")
 }
 
