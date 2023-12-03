@@ -13,7 +13,7 @@ type TLVFileReader struct {
 	Map      map[string]string
 }
 
-func CreateTLVFileReader(filePath string) *TLVFileReader {
+func NewTLVFileReader(filePath string) *TLVFileReader {
 	return &TLVFileReader{
 		FilePath: filePath,
 		Map:      make(map[string]string),

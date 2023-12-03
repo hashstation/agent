@@ -56,7 +56,7 @@ func main() {
 		configFile = os.Args[1]
 	}
 
-	tlvFileReader := utils.CreateTLVFileReader(configFile)
+	tlvFileReader := utils.NewTLVFileReader(configFile)
 	err = tlvFileReader.Parse()
 	if err != nil {
 		panic(err)
@@ -65,5 +65,8 @@ func main() {
 	for k, v := range tlvFileReader.Map {
 		fmt.Printf("%s: %v\n", k, v)
 	}
+
+	namedFileLock := utils.NewNamedFileLock("hashcat.lock")
+	defer namedFileLock.Unlock()
 
 }
