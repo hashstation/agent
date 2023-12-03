@@ -69,4 +69,6 @@ func main() {
 	namedFileLock := utils.NewNamedFileLock("hashcat.lock")
 	defer namedFileLock.Unlock()
 
+	computeTask := utils.NewTask(tlvFileReader.Map, hashcatBinary, "")
+	_ = computeTask
 }

@@ -19,7 +19,7 @@ func NewNamedFileLock(lockName string) *NamedFileLock {
 	} else {
 		lockPath = filepath.Join("/var/lib/boinc-client/", lockName)
 	}
-	
+
 	return &NamedFileLock{
 		FileLock: flock.New(lockPath),
 	}
